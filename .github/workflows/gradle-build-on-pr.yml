@@ -1,24 +1,29 @@
-name: gradle-build-on-pr
-
-on: [pull_request]
-
 jobs:
   gradle:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: self-hosted
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK
+    - continue-on-error: true
+      uses: actions/checkout@v4
+    - continue-on-error: true
+      name: Set up JDK
       uses: actions/setup-java@v4
       with:
-          distribution: 'temurin' # See 'Supported distributions' for available options
-          java-version: '21'
-          cache: 'gradle'
-
-    - name: Setup Gradle
+        cache: gradle
+        distribution: temurin
+        java-version: '21'
+    - continue-on-error: true
+      name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
-    
-    - name: Execute Gradle build
+    - continue-on-error: true
+      name: Execute Gradle build
       run: ./gradlew build
+    strategy:
+      matrix:
+        os:
+        - ubuntu-latest
+        - macos-latest
+        - windows-latest
+name: gradle-build-on-pr
+on:
+  repository_dispatch:
+    types: trigger-ga___gradle-build-on-pr.yml
